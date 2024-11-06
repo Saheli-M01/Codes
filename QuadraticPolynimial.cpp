@@ -1,3 +1,4 @@
+//Factorization of Quadratic Polynomial by Splitting the Middle Term 
 #include <iostream>
 #include <cmath> 
 using namespace std;
