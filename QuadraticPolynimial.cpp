@@ -1,4 +1,5 @@
 //Factorization of Quadratic Polynomial by Splitting the Middle Term 
+// ax^2 + bx + c = (px+q)(rx+s)
 #include <iostream>
 #include <cmath> 
 using namespace std;
