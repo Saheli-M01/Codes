@@ -64,7 +64,7 @@ void factor(int a, int b, int c){
             q="("+to_string(abs(discriminant))+"^.5)";
         }
         
-
+        cout<<"\n\t\t";
         cout << "(1/" + to_string(commonFactor) + ")(" + realPart + " + " + q + ")(" + realPart + " - " + q + ")";
     }else{
         int common1=abs(gcd(a,fac1)); //let's 5x^2 + 6x -5x -6, common1=(gcd(5,-5))=-5
@@ -91,6 +91,7 @@ void factor(int a, int b, int c){
         int overallCommonFactor= commonFactor1 * commonFactor2;
 
        // Print output with condition to avoid overlapping sign and proper coefficient
+        cout<<"\n\t\t";
         if (tempa < 0) {        //handling -a
             overallCommonFactor*=-1;
         }
