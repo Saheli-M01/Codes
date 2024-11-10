@@ -10,6 +10,22 @@ int gcd(int a, int b){
     return gcd(b, a%b);
 }
 
+//root calculation 
+string root(int n) {
+    n=abs(n);
+    int sum = 1;
+
+    // Factorize the number
+    for (int i = 2; i * i <= n; i++) {
+        if (n % (i * i) == 0) {
+            sum *= i;
+            n /= i * i;
+        }
+    }
+
+    // Return root as a string
+    return (sum == 1 ? (n != 1 ? "(" + to_string(n) + "^0.5)" : "1") : to_string(sum) + (n != 1 ? "*(" + to_string(n) + "^0.5)" : ""));
+}
 //factorisation
 void factor(int a, int b, int c){
     int tempa=a;
@@ -57,11 +73,9 @@ void factor(int a, int b, int c){
                   (to_string(p) + "x - " + to_string(abs(tempb))) : 
                   (to_string(p) + "x + " + to_string(tempb));
 
-        string q;
+        string q=root(discriminant);
         if (discriminant < 0) {
-            q="i("+to_string(abs(discriminant))+"^.5)";
-        }else{
-            q="("+to_string(abs(discriminant))+"^.5)";
+            q="i"+ q;
         }
         
         cout<<"\n\t\t";
@@ -91,7 +105,7 @@ void factor(int a, int b, int c){
         int overallCommonFactor= commonFactor1 * commonFactor2;
 
        // Print output with condition to avoid overlapping sign and proper coefficient
-        cout<<"\n\t\t";
+       cout<<"\n\t\t";
         if (tempa < 0) {        //handling -a
             overallCommonFactor*=-1;
         }
@@ -132,5 +146,6 @@ int main() {
     cin>>c;
 
     factor(a,b,c);
+    
     return 0;
 }
