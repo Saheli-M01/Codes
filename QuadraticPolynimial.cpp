@@ -1,4 +1,4 @@
-//Factorization of Quadratic Polynomial by Splitting the Middle Term 
+//Factorization of Quadratic Polynomial 
 // ax^2 + bx + c = (px+q)(rx+s) or (px+iq)(px-iq)
 #include <iostream>
 #include <cmath> 
