@@ -1,5 +1,5 @@
 //Factorization of Quadratic Polynomial by Splitting the Middle Term 
-// ax^2 + bx + c = (px+q)(rx+s)
+// ax^2 + bx + c = (px+q)(rx+s) or (px+iq)(px-iq)
 #include <iostream>
 #include <cmath> 
 using namespace std;
@@ -29,7 +29,7 @@ void factor(int a, int b, int c){
     //set ac
     int ac=a*c;
 
-    // Find two numbers that musltiply to (a * c) and add up to b
+    // Find two numbers that multiply to (a * c) and add up to b
     for (int i = -abs(ac); i <= abs(ac); i++) {
         if (i != 0 && (ac) % i == 0) { // avoid division by zero
             int j = (ac) / i;
@@ -45,10 +45,27 @@ void factor(int a, int b, int c){
     cout<<(tempb >= 0 ? " + " : " - ") << abs(tempb) << "x";
     cout<<(tempc >= 0 ? " + " : " - ") << abs(tempc) <<" : " ;
 
-    //check if factorisation possible or not
+    //check if middle term factorisation possible or not
     if(fac1==0){
-        cout<<"Factorisation is not possible";
-        return;
+        int p;
+        //calculate discriminant
+        int discriminant = (tempb*tempb)-(4*tempa*tempc);
+        
+        p = 2*tempa;
+        int commonFactor= (p*p)/tempa; //to match the value of a
+        string realPart = (tempb < 0) ? 
+                  (to_string(p) + "x - " + to_string(abs(tempb))) : 
+                  (to_string(p) + "x + " + to_string(tempb));
+
+        string q;
+        if (discriminant < 0) {
+            q="i("+to_string(abs(discriminant))+"^.5)";
+        }else{
+            q="("+to_string(abs(discriminant))+"^.5)";
+        }
+        
+
+        cout << "(1/" + to_string(commonFactor) + ")(" + realPart + " + " + q + ")(" + realPart + " - " + q + ")";
     }else{
         int common1=abs(gcd(a,fac1)); //let's 5x^2 + 6x -5x -6, common1=(gcd(5,-5))=-5
         int common2=abs(gcd(c,fac2)); //let's 5x^2 + 6x -5x -6, common1=(gcd(-6,6))=6
