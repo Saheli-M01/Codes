@@ -75,7 +75,7 @@ void factor(int a, int b, int c){
 
         string q=root(discriminant);
         if (discriminant < 0) {
-            q="i"+ q;
+            q="i*"+ q;
         }
         
         cout<<"\n\t\t";
