@@ -27,7 +27,7 @@ string root(int n) {
     return (sum == 1 ? (n != 1 ? "(" + to_string(n) + "^0.5)" : "1") : to_string(sum) + (n != 1 ? "*(" + to_string(n) + "^0.5)" : ""));
 }
 //factorisation
-void factor(int a, int b, int c){
+string factor(int a, int b, int c){
     int tempa=a;
     int tempb=b;
     int tempc=c;
@@ -69,9 +69,8 @@ void factor(int a, int b, int c){
         
         p = 2*tempa;
         int commonFactor= (p*p)/tempa; //to match the value of a
-        string realPart = (tempb < 0) ? 
-                  (to_string(p) + "x - " + to_string(abs(tempb))) : 
-                  (to_string(p) + "x + " + to_string(tempb));
+      
+        string realPart = to_string(p) + "x" + (tempb == 0 ? "" : (tempb < 0 ? " - " + to_string(abs(tempb)) : " + " + to_string(tempb)));
 
         string q=root(discriminant);
         if (discriminant < 0) {
@@ -79,7 +78,9 @@ void factor(int a, int b, int c){
         }
         
         cout<<"\n\t\t";
-        cout << "(1/" + to_string(commonFactor) + ")(" + realPart + " + " + q + ")(" + realPart + " - " + q + ")";
+        string factor1="(" + realPart + " + " + q + ")";
+        string factor2="(" + realPart + " - " + q + ")";
+        return "(1/" + to_string(commonFactor) + ")" + factor1 + factor2;
     }else{
         int common1=abs(gcd(a,fac1)); //let's 5x^2 + 6x -5x -6, common1=(gcd(5,-5))=-5
         int common2=abs(gcd(c,fac2)); //let's 5x^2 + 6x -5x -6, common1=(gcd(-6,6))=6
@@ -109,32 +110,21 @@ void factor(int a, int b, int c){
         if (tempa < 0) {        //handling -a
             overallCommonFactor*=-1;
         }
-        // Check if the overall common factor is 1 or -1
-        if (overallCommonFactor == 1 || overallCommonFactor == -1) {
-            // If the overall common factor is -1, start with a negative sign
-            if (overallCommonFactor == -1) cout << "-";
+        // string overallCommonFactorStr = to
+        string overallCommonFactorStr = (abs(overallCommonFactor) == 1) ? (overallCommonFactor == 1) ? "" : "-" : to_string(overallCommonFactor);
+            
+        // Print the first factor with the common factor applied
+        string firstFactor="("+ (p == 1 ? "x " : (p == -1 ? "-x " : to_string(p) + "x ")) +
+                            (q >= 0 ? "+ " : "- ") + to_string(abs(q)) + ")";
 
-            cout<<"(";
-            // Print the first factor
-            cout << (p == 1 ? "x " : (p == -1 ? "-x " : to_string(p) + "x ")) 
-                << (q >= 0 ? "+ " : "- ") << abs(q) << ") ";
-
-            // Print the second factor
-            cout << "(" << (r == 1 ? "x " : (r == -1 ? "-x " : to_string(r) + "x ")) 
-                << (s >= 0 ? "+ " : "- ") << abs(s) << ")";
-        } else {
-            // If the overall common factor is not 1 or -1, print it as a multiplier
-            cout << overallCommonFactor << "(";
-
-            // Print the first factor with the common factor applied
-            cout << (p == 1 ? "x " : (p == -1 ? "-x " : to_string(p) + "x ")) 
-                << (q >= 0 ? "+ " : "- ") << abs(q) << ") ";
-
-            // Print the second factor with the common factor applied
-            cout <<"(" << (r == 1 ? "x " : (r == -1 ? "-x " : to_string(r) + "x ")) 
-                << (s >= 0 ? "+ " : "- ") << abs(s) << ")";
-        }
+        // Print the second factor with the common factor applied
+        string secondFactor="(" + (r == 1 ? "x " : (r == -1 ? "-x " : to_string(r) + "x ")) +
+                            (s >= 0 ? "+ " : "- ") + to_string(abs(s)) + ")";
+        
+        return (overallCommonFactorStr + firstFactor + secondFactor);
+        
     }
+    
 }
 int main() {
     int a,b,c;
@@ -145,7 +135,7 @@ int main() {
     cout << "Enter value of c: ";
     cin>>c;
 
-    factor(a,b,c);
+    cout<<factor(a,b,c);
     
     return 0;
 }
