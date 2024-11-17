@@ -78,6 +78,7 @@ string factor(int a, int b, int c){
         int r=factor2/common2; // 6/6=1, r in (px+q)(rx+s)
         int s=c/common2; // -6/6=-1, s in (px+q)(rx+s)
 
+        if (p==-r && q==-s) common2*=-1;
         // string overallCommonFactorStr = to
         string overallCommonFactor = 
                 (abs(common) == 1) ? 
