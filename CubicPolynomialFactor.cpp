@@ -55,6 +55,7 @@ string cubicFactor(int a, int b, int c, int d) {
 
     //taking common from a,b,c to simplify the calculations
     int cubicCommon=gcd(gcd(a,b),gcd(c,d));
+
     
     //simplifying a,b,c;
     a/=cubicCommon;
@@ -88,20 +89,18 @@ string cubicFactor(int a, int b, int c, int d) {
             if (checkRoot(a, b, c, d, root)) {
                 rootFound = true;
                 // Construct the root string with a ternary operator
+                // cout<<endl<<"factorD: "<<factorD<<endl<<"factorA: "<<factorA<<endl;
                 int numerator=factorD*(-1);
                 int denominator=factorA;
-                int factorCommon=gcd(numerator,denominator);
-                numerator/=factorCommon;
-                denominator/=factorCommon;
-                cubicCommon*=factorCommon;
+               
                 cubeFactor ="("
                     + ((abs(denominator)==1)?((denominator==1)? "" : "-"):
                     to_string(denominator)) + "x " +(((numerator)<0)? "-" :"+ ") + to_string(abs(numerator))+")";
                
                 quadA=a/denominator;
-                quadB=(b-(a*numerator))/denominator;
+                quadB=(b-(quadA*numerator))/denominator;
                 quadC=d/numerator;
-           
+        //    cout<<endl<<quadA<<endl<<quadB<<endl<<quadC<<endl;
                 goto endLoops; 
                 
             }
@@ -115,15 +114,9 @@ endLoops:
     // Quad factors  
 
      //taking common from a,b,c to simplify the calculations
-    int quadCommon=gcd(gcd(quadA,quadB),quadC);
-
-    //simplifying a,b,c;
-    quadA/=quadCommon;
-    quadB/=quadCommon;
-    quadC/=quadCommon;
     
     if(quadA<0){
-        quadCommon*=(-1);
+        cubicCommon*=(-1);
         quadA*=(-1);
         quadB*=(-1);
         quadC*=(-1);
@@ -154,12 +147,12 @@ endLoops:
         int r=factor2/common2; // 6/6=1, r in (px+q)(rx+s)
         int s=quadC/common2; // -6/6=-1, s in (px+q)(rx+s)
 
-        int common=quadCommon * cubicCommon;
+        
         // string overallCommonFactorStr = to
         string overallCommonFactor = 
-                (abs(common) == 1) ? 
-                (common == 1) ? "" : "-" 
-                : to_string(common);
+                (abs(cubicCommon) == 1) ? 
+                (cubicCommon == 1) ? "" : "-" 
+                : to_string(cubicCommon);
         // Print the first factor with the common factor applied
         string firstFactor = "(" + (p == 1 ? "x " : (p == -1 ? "-x " : to_string(p) + "x ")) +
                              (q >= 0 ? "+ " : "- ") + to_string(abs(q)) + ")";
@@ -181,7 +174,7 @@ endLoops:
         divisor/=takeCommon;
         b/=takeCommon;
         root.first/=takeCommon;
-        int common=quadCommon*takeCommon;
+        int common=cubicCommon*takeCommon;
 
         int balanceFactor=2*divisor;
         int factor=gcd(balanceFactor,common);
@@ -194,7 +187,7 @@ endLoops:
 
         //common/balance factor ko handle kar lena bhai mera pilis
         string unrealPart = (discriminant < 0 ? "i*" : "") + 
-                (root.first == 1 ? "" : to_string(root.first)) + 
+                (root.first == 1 ? "" : to_string(abs(root.first))) + 
                 "(" + to_string(root.second) + "^0.5)";
         string realPart=(divisor == 1 ? "" : to_string(divisor)) + "x" + 
                   (b == 0 ? "" : (b < 0 ? " - " + to_string(abs(b)) : " + " + to_string(b)));
@@ -219,13 +212,19 @@ int main() {
 
     // cubicFactor(a, b, c, d);
     // cubicFactor(90, -101, -63, 18);
-    // cubicFactor(2, 11, 17, 6);
+    // cubicFactor(2, 11, 17, 6);s
     // cubicFactor(30, 13, -13, -6);
     // cubicFactor(10, -3, -37, 18);
     // cubicFactor(1, -41, -1, 41);
     // cout<< cubicFactor(2, -1, -82, 41)<<endl;
-    cout<<cubicFactor(4, 22, 34, 12)<<endl; //issue
-    cout<<cubicFactor(1, -1, 41, -41); 
+    // cout<<cubicFactor(4, 22, 34, 12)<<endl; //issue
+    // cout<<cubicFactor(1, -1, 41, -41); 
+    // cout<<cubicFactor(10, -3, -37, 18)<<endl;
+    // cout<<cubicFactor(-10, 3, 37, -18)<<endl;
+    // cout<<cubicFactor(20, -6, -74, 36)<<endl;
+    // cout<<cubicFactor(-20, 6, 74, -36)<<endl;
+    // cout<<cubicFactor(10, -11, -51, -18)<<endl;
+    // cout<<cubicFactor(-10, 11, 51, 18)<<endl;
     //  cubicFactor(1, -6, 11, -6); 
     // cubicFactor(2, 4, -2, -4); 
     //  cout<<cubicFactor(1,1,1,1)<<endl; 
@@ -233,6 +232,12 @@ int main() {
     // // cout<< cubicFactor(1,2,3,4)<<endl;
     // cout<< cubicFactor(2,6,-26,-30)<<endl;
     // cout<< cubicFactor(-2,-6,26,30)<<endl;
+    cout<< cubicFactor(2,2,82,82)<<endl;
+    cout<< cubicFactor(-2,-2,-82,-82)<<endl;
+    cout<< cubicFactor(1,1,-41,-41)<<endl;
+    cout<< cubicFactor(-1,-1,41,41)<<endl;
+    cout<< cubicFactor(2,2,-82,-82)<<endl;
+
     //handle if the first cubic factor has any common factor, if yes then multiply with the overall common factor from quadfactor, also check if factorA and factorD is <0 then take -1 common
     return 0;
 }
