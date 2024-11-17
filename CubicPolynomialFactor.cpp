@@ -1,29 +1,28 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <sstream>
 using namespace std;
 
 //gcd calculation
 int gcd(int a, int b){
-    if(b==0) return a;
-    return gcd(b, a%b);
+    return b == 0 ? a : gcd(b, a % b);
 }
 
 //root calculation 
-string findRoot(int n) {
-    n=abs(n);
+pair<int, int> findRoot(int n) {
     int sum = 1;
+    int remainder = abs(n);
 
     // Factorize the number
-    for (int i = 2; i * i <= n; i++) {
-        if (n % (i * i) == 0) {
+    for (int i = 2; i * i <= remainder; i++) {
+        while (remainder % (i * i) == 0) {
             sum *= i;
-            n /= i * i;
+            remainder /= (i * i);
         }
     }
 
-    // Return root as a string
-    return (sum == 1 ? (n != 1 ? "(" + to_string(n) + "^0.5)" : "1") : to_string(sum) + (n != 1 ? "*(" + to_string(n) + "^0.5)" : ""));
+    return {sum, remainder};
 }
 
 // Function to find factors of a number
@@ -53,124 +52,157 @@ string cubicFactor(int a, int b, int c, int d) {
     cout<<(b >= 0 ? " + " : " - ") << abs(b) << "x^2";
     cout<<(c >= 0 ? " + " : " - ") << abs(c) << "x";
     cout<<(d >= 0 ? " + " : " - ") << abs(d) <<" : " ;
+
+    //taking common from a,b,c to simplify the calculations
+    int cubicCommon=gcd(gcd(a,b),gcd(c,d));
+    
+    //simplifying a,b,c;
+    a/=cubicCommon;
+    b/=cubicCommon;
+    c/=cubicCommon;
+    d/=cubicCommon;
+    if(a<0){
+        cubicCommon*=(-1);
+        a*=(-1);
+        b*=(-1);
+        c*=(-1);
+        d*=(-1);    
+    }
+
+    // cout<<"a: "<<a<<endl<<
+    // "b: "<<b<<endl<<
+    // "c: "<<c<<endl<<
+    // "d: "<<d<<endl;
+
     // Find factors of a and d
     vector<int> factorsA = findFactors(a);
     vector<int> factorsD = findFactors(d);
 
+    bool rootFound = false;
+    int quadA, quadB,quadC;
+    string cubeFactor;
     // Try each combination of factors of d/a
     for (int factorD : factorsD) {
         for (int factorA : factorsA) {
             double root = static_cast<double>(factorD) / factorA;
             if (checkRoot(a, b, c, d, root)) {
+                rootFound = true;
                 // Construct the root string with a ternary operator
-                int C=d/(-1)*factorD;
-                int A=a/factorA;
-                int B=(b-(-1*a*factorD))/factorA;
-
-                int commonFactor= gcd((-1*factorD), factorA);
-                factorD=(factorD/commonFactor)*(-1);
-                factorA/=commonFactor;
-                string cubeFactor ="("+ to_string(factorA) + "x " +((factorD<0)? "-" :"+ ") + to_string(abs(factorD))+")";                
+                int numerator=factorD*(-1);
+                int denominator=factorA;
+                int factorCommon=gcd(numerator,denominator);
+                numerator/=factorCommon;
+                denominator/=factorCommon;
+                cubicCommon*=factorCommon;
+                cubeFactor ="("
+                    + ((abs(denominator)==1)?((denominator==1)? "" : "-"):
+                    to_string(denominator)) + "x " +(((numerator)<0)? "-" :"+ ") + to_string(abs(numerator))+")";
+               
+                quadA=a/denominator;
+                quadB=(b-(a*numerator))/denominator;
+                quadC=d/numerator;
+           
+                goto endLoops; 
                 
-    //quad factor
-                int tempa=A;
-                int tempb=B;
-                int tempc=C;
-    //if a<0, * with -1 and at last add negative before the result
-                if(A<0){
-                    A*=(-1);
-                    B*=(-1);
-                    C=d*(-1);
-                }
-                
-    //finding middle term factors
-                int fac1=0;
-                int fac2=0;
-
-                //set ac
-                int ac=A*C;
-
-    // Find two numbers that multiply to (a * c) and add up to b
-                for (int i = -abs(ac); i <= abs(ac); i++) {
-                    if (i != 0 && (ac) % i == 0) { // avoid division by zero
-                        int j = (ac) / i;
-                        if (i + j == B) {
-                            fac1 = i; //let's 5x^2 + 6x -5x -6,  fac1=-5;
-                            fac2 = j;//let's 5x^2 + 6x -5x -6, fac2=6;
-                            break;
-                        }
-                    }
-                }
-
-
-    //check if middle term factorisation possible or not
-                if(fac1==0){
-                    int p;
-    //calculate discriminant
-                    int discriminant = (tempb*tempb)-(4*tempa*tempc);
-                    
-                    p = 2*tempa;
-                    commonFactor*= ((p*p)/tempa); //to match the value of a
-                
-                    string realPart = to_string(p) + "x" + (tempb == 0 ? "" : (tempb < 0 ? " - " + to_string(abs(tempb)) : " + " + to_string(tempb)));
-
-                    string q=findRoot(discriminant);
-                    if (discriminant < 0) {
-                        q="i*"+ q;
-                    }
-                    
-                    string factor1="(" + realPart + " + " + q + ")";
-                    string factor2="(" + realPart + " - " + q + ")";
-                    string quadFactors="(1/" + to_string(commonFactor) + ")" + factor1 + factor2;
-                    return quadFactors + cubeFactor;
-                }else{
-                    int common1=abs(gcd(a,fac1)); //let's 5x^2 + 6x -5x -6, common1=(gcd(5,-5))=-5
-                    int common2=abs(gcd(c,fac2)); //let's 5x^2 + 6x -5x -6, common1=(gcd(-6,6))=6
-
-                    int term00=a/common1; //term00=5/-5=-1, term00 is p in (px+q)(rx+s)
-                    int term01=fac1/common1; //term00=-5/-5=1, term01 is q in (px+q)(rx+s)
-                    int term10=fac2/common2; //term00=6/6=1, term10 is r in (px+q)(rx+s)
-                    int term11=c/common2; //term00=-6/6=-1, term11 is s in (px+q)(rx+s)
-
-    //check if the factors are same or in (-1)*factor format
-                    if(term00 == (-1)*term10 && term01 == (-1)* term11 ) {
-                        common2*=(-1);
-                    }
-                
-                    //check for any common factor
-                    int commonFactor1 = gcd(term00, term01); //check if there is any common factor b/w p&q
-                    int commonFactor2 = gcd(common1, common2); //check if there is any common factor b/w r&s
-    //calculating final p,q,r,s values
-                    int p = term00 / commonFactor1;
-                    int q = term01 / commonFactor1;
-                    int r = common1 / commonFactor2;
-                    int s = common2 / commonFactor2;
-                    commonFactor= commonFactor1 * commonFactor2 ;
-
-    // Print output with condition to avoid overlapping sign and proper coefficient
-
-                    if (tempa < 0) {        //handling -a
-                        commonFactor*=-1;
-                    }
-    // string overallCommonFactorStr = to
-                    string overallCommonFactor = (abs(commonFactor) == 1) ? (commonFactor == 1) ? "" : "-" : to_string(commonFactor);
-                        
-    // Print the first factor with the common factor applied
-                    string firstFactor="("+ (p == 1 ? "x " : (p == -1 ? "-x " : to_string(p) + "x ")) +
-                                        (q >= 0 ? "+ " : "- ") + to_string(abs(q)) + ")";
-
-    // Print the second factor with the common factor applied
-                    string secondFactor="(" + (r == 1 ? "x " : (r == -1 ? "-x " : to_string(r) + "x ")) +
-                                        (s >= 0 ? "+ " : "- ") + to_string(abs(s)) + ")";
-                    
-                    string quadFactors= (overallCommonFactor + firstFactor + secondFactor);
-                    return quadFactors + cubeFactor;
-                }
             }
         }
+    } 
+    if (!rootFound) {
+     
+        return "No valid root found.";  // Return message if no root is found
     }
-    return "No rational root found." ;
+endLoops:
+    // Quad factors  
 
+     //taking common from a,b,c to simplify the calculations
+    int quadCommon=gcd(gcd(quadA,quadB),quadC);
+
+    //simplifying a,b,c;
+    quadA/=quadCommon;
+    quadB/=quadCommon;
+    quadC/=quadCommon;
+    
+    if(quadA<0){
+        quadCommon*=(-1);
+        quadA*=(-1);
+        quadB*=(-1);
+        quadC*=(-1);
+    }
+    //set ac
+    int ac=quadA*quadC;
+
+    int factor1=0,factor2=0; //factor1=0, factor2=0 means middle term is not possible
+    //find middle term factors 
+    for (int i = -abs(ac); i <= abs(ac); i++) {
+        if (i != 0 && (ac) % i == 0) { // avoid division by zero
+            int j = (ac) / i;
+            if (i + j == quadB) {
+                factor1 = i; //let's 5x^2 + 6x -5x -6,  fac1=-5;
+                factor2 = j;//let's 5x^2 + 6x -5x -6, fac2=6;
+                break;
+            }
+        }
+    } 
+
+    if(factor1!=0){
+        //middle term possible
+        int common1=abs(gcd(quadA,factor1)); //let's 5x^2 + 6x -5x -6, common1=(gcd(5,-5))=-5
+        int common2=abs(gcd(factor2,quadC)); //let's 5x^2 + 6x -5x -6, common1=(gcd(-6,6))=6
+
+        int p=quadA/common1; //5/-5=-1,  p in (px+q)(rx+s)
+        int q=factor1/common1; // -5/-5=1, q in (px+q)(rx+s)
+        int r=factor2/common2; // 6/6=1, r in (px+q)(rx+s)
+        int s=quadC/common2; // -6/6=-1, s in (px+q)(rx+s)
+
+        int common=quadCommon * cubicCommon;
+        // string overallCommonFactorStr = to
+        string overallCommonFactor = 
+                (abs(common) == 1) ? 
+                (common == 1) ? "" : "-" 
+                : to_string(common);
+        // Print the first factor with the common factor applied
+        string firstFactor = "(" + (p == 1 ? "x " : (p == -1 ? "-x " : to_string(p) + "x ")) +
+                             (q >= 0 ? "+ " : "- ") + to_string(abs(q)) + ")";
+        string secondFactor = "(" + (common1 == 1 ? "x " : (common1 == -1 ? "-x " : to_string(common1) + "x ")) +
+                              (common2 >= 0 ? "+ " : "- ") + to_string(abs(common2)) + ")";
+        
+        
+
+        return overallCommonFactor + firstFactor + secondFactor + cubeFactor;
+    }else{
+        //middle term isn't possible
+        //calculate discriminant
+        int divisor = 2*quadA;  //2a
+
+        int discriminant = (quadB*quadB)-(4*quadA*quadC);
+
+        pair<int, int> root = findRoot(discriminant);
+        int takeCommon=gcd(gcd(divisor,quadB),root.first);
+        divisor/=takeCommon;
+        b/=takeCommon;
+        root.first/=takeCommon;
+        int common=quadCommon*takeCommon;
+
+        int balanceFactor=2*divisor;
+        int factor=gcd(balanceFactor,common);
+        common/=factor;
+        balanceFactor/=factor;
+
+        string overallCommonFactor ="("+ ((balanceFactor == 1) ? to_string(common) :
+                            (balanceFactor == -1) ? to_string(-common) :
+                            to_string(common) + "/" + to_string(balanceFactor)) + ")";
+
+        //common/balance factor ko handle kar lena bhai mera pilis
+        string unrealPart = (discriminant < 0 ? "i*" : "") + 
+                (root.first == 1 ? "" : to_string(root.first)) + 
+                "(" + to_string(root.second) + "^0.5)";
+        string realPart=(divisor == 1 ? "" : to_string(divisor)) + "x" + 
+                  (b == 0 ? "" : (b < 0 ? " - " + to_string(abs(b)) : " + " + to_string(b)));
+        string firstFactor= "(" + realPart + "+" + unrealPart + ")";
+        string secondFactor= "(" + realPart + "-" + unrealPart + ")";
+
+        return overallCommonFactor + firstFactor + secondFactor + cubeFactor;
+    }
 }
 
 int main() {
@@ -191,14 +223,16 @@ int main() {
     // cubicFactor(30, 13, -13, -6);
     // cubicFactor(10, -3, -37, 18);
     // cubicFactor(1, -41, -1, 41);
-    cout<< cubicFactor(2, -1, -82, 41)<<endl;
-    // cubicFactor(4, 22, 34, 12); //issue
-    // cubicFactor(1, -1, 41, -41); 
+    // cout<< cubicFactor(2, -1, -82, 41)<<endl;
+    cout<<cubicFactor(4, 22, 34, 12)<<endl; //issue
+    cout<<cubicFactor(1, -1, 41, -41); 
     //  cubicFactor(1, -6, 11, -6); 
     // cubicFactor(2, 4, -2, -4); 
-    //  cubicFactor(1,1,1,1); 
-     //cubicFactor(1,2,1,2);-getting error 
-    cout<< cubicFactor(1,2,3,4);
+    //  cout<<cubicFactor(1,1,1,1)<<endl; 
+    //  //cubicFactor(1,2,1,2);-getting error 
+    // // cout<< cubicFactor(1,2,3,4)<<endl;
+    // cout<< cubicFactor(2,6,-26,-30)<<endl;
+    // cout<< cubicFactor(-2,-6,26,30)<<endl;
     //handle if the first cubic factor has any common factor, if yes then multiply with the overall common factor from quadfactor, also check if factorA and factorD is <0 then take -1 common
     return 0;
 }
