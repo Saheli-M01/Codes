@@ -111,9 +111,12 @@ string factor(int a, int b, int c){
         common/=factor;
         balanceFactor/=factor;
 
-        string overallCommonFactor ="("+ ((balanceFactor == 1) ? to_string(common) :
-                            (balanceFactor == -1) ? to_string(-common) :
-                            to_string(common) + "/" + to_string(balanceFactor)) + ")";
+        string overallCommonFactor = 
+                    (common / balanceFactor == 1) ? "" :
+                    (common / balanceFactor == -1) ? "-" :
+                    (balanceFactor == 1) ? to_string(common) :
+                    (balanceFactor == -1) ? to_string(-common) :
+                    to_string(common) + "/" + to_string(balanceFactor);
 
         //common/balance factor ko handle kar lena bhai mera pilis
         string unrealPart = (discriminant < 0 ? "i*" : "") + 
