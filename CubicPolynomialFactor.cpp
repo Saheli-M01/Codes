@@ -147,7 +147,7 @@ endLoops:
         int r=factor2/common2; // 6/6=1, r in (px+q)(rx+s)
         int s=quadC/common2; // -6/6=-1, s in (px+q)(rx+s)
 
-        
+        if (p==-r && q==-s) common2*=-1;
         // string overallCommonFactorStr = to
         string overallCommonFactor = 
                 (abs(cubicCommon) == 1) ? 
