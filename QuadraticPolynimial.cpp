@@ -117,7 +117,7 @@ string factor(int a, int b, int c){
 
         //common/balance factor ko handle kar lena bhai mera pilis
         string unrealPart = (discriminant < 0 ? "i*" : "") + 
-                (root.first == 1 ? "" : to_string(root.first)) + 
+                (root.first == 1 ? "" : to_string(abs(root.first))) + 
                 "(" + to_string(root.second) + "^0.5)";
         string realPart=(divisor == 1 ? "" : to_string(divisor)) + "x" + 
                   (b == 0 ? "" : (b < 0 ? " - " + to_string(abs(b)) : " + " + to_string(b)));
