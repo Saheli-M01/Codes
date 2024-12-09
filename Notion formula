@@ -1,0 +1,58 @@
+lets(
+    streaks,
+    /* Access the Habits Relation-type property to get all related pages from the Habits database. Sort them by their Date property. Reverse the sorted List so the latest date is first. Next, map through all the Habit rows in the sorted List to export a new List that contains the Checkbox (Boolean) values of the "Drink Water" property. Slice the List to exclude the latest date. Map through the List to convert the Boolean values to Numbers. Join the List into a single String. Split the String by "0" to create a List of Strings. Map through the List to get the length of each String. */
+    prop("Daily habit").sort(current.prop("Date"))
+        .reverse().map(current.prop("Web Dev"))
+        .slice(1)
+        .map(current.toNumber())
+        .join("")
+        .split("0")
+        .map(current.length()),
+    currentStreak,
+    /* Get the first element of the List of streaks. */
+    streaks.first(),
+    longestStreak,
+    /* Get the maximum value of the List of streaks. */
+    streaks.max(),
+    totalStreak,
+    /* Calculate the total streak by summing all streak lengths. */
+    streaks.sum(),
+    csFormat,
+    /* Ifs statement to determine the formatting variables for the Current streak. Sets both the color of the streak and plurality of the word "day(s)". */
+    ifs(
+        currentStreak < 1,
+        ["red", " days"],
+        currentStreak == 1,
+        ["blue", " day"],
+        currentStreak > 1,
+        ["green", " days"]
+    ),
+    lsFormat,
+    /* Get the same formatting variables for the Longest Streak. */
+    ifs(
+        longestStreak < 1,
+        ["red", " days"],
+        longestStreak == 1,
+        ["blue", " day"],
+        longestStreak > 1,
+        ["green", " days"]
+    ),
+    tsFormat,
+    /* Determine the formatting variables for the Total Streak. */
+    ifs(
+        totalStreak == 0,
+        ["red", " days"],
+        totalStreak >= 1 && totalStreak <= 4,
+        ["purple", " days"],
+        totalStreak > 4,
+        ["pink", " days"]
+    ),
+    /* Construct a final string, which displays the streak counts with styling, and which will be returned from the lets() function. */
+    "Web Dev: " + (
+        "Current: " + currentStreak + csFormat.at(1)).style(csFormat.at(0), csFormat.at(0) + "_background", "c", "b"
+    ) + " " + (
+        "Longest: " + longestStreak + lsFormat.at(1)).style(lsFormat.at(0), lsFormat.at(0) + "_background", "c", "b"
+    ) + " " + (
+        "Total: " + totalStreak + tsFormat.at(1)).style(tsFormat.at(0), tsFormat.at(0) + "_background", "c", "b"
+    )
+)
